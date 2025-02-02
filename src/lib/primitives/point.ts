@@ -14,6 +14,14 @@ class Point {
     ctx.fill()
     ctx.closePath()
   }
+
+  distant(point: Point) : number {
+    return Math.sqrt(Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2))
+  }
+
+  equars(point: Point): boolean {
+    return this.x === point.x && this.y === point.y
+  }
 }
 
 export default Point
