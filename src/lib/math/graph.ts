@@ -66,7 +66,7 @@ class Graph {
       seg.draw(ctx)
     )
     this.points.forEach(pt =>
-      pt.draw(ctx, 20, 'seagreen')
+      pt.draw(ctx, {size: 20, color: 'seagreen'})
     )
   }
 }
