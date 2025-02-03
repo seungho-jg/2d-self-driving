@@ -1,23 +1,44 @@
 import type Graph from "$lib/math/graph";
 import Point from "$lib/primitives/point";
+import Segment from "$lib/primitives/segment";
 
 class GraphEditor {
   canvas: HTMLCanvasElement
   graph: Graph
   ctx: CanvasRenderingContext2D
   selected: Point | null
-  hovered: Point | undefined
-  isClicked: boolean
+  hovered: Point | null
+  dragging: boolean
+  mouse: Point | null
+  lastAction: string | null
 
   constructor(canvas: HTMLCanvasElement, grahp: Graph){
     this.canvas = canvas
     this.graph = grahp
     this.selected = null
-    this.isClicked = false
+    this.dragging = false
+    this.hovered = null
+    this.mouse = null
+    this.lastAction = null
 
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D
 
     this.#addEventListeners()
+  }
+
+  #removePoint(pt: Point) {
+    this.graph.removePoint(pt)
+    this.hovered = null
+    if (this.selected == pt) {
+      this.selected = null
+    }
+  }
+
+  #select(pt: Point) {
+    if (this.selected) {
+      this.graph.tryAddSegment(new Segment(this.selected, pt))
+    }
+    this.selected = pt
   }
 
   #addEventListeners(){
@@ -25,44 +46,60 @@ class GraphEditor {
     this.canvas.addEventListener("contextmenu", (e) => {
       e.preventDefault()
   })
-    this.canvas.addEventListener("mousedown", (e : MouseEvent) => {
-      if(e.button === 2){ // right click
-        if(this.hovered) {
-          this.graph.removePoint(this.hovered)
-        }
-
-        this.selected = null
-
-      }
-      if (e.button === 0) {
-        const mouse = new Point(e.offsetX, e.offsetY)
-        this.isClicked = true
-        if (this.hovered) {
-          this.selected = this.hovered
-          return
-        }
-        this.graph.addPoint(mouse)
-        this.selected = mouse
-      }
-    })
+    this.canvas.addEventListener("mousedown", this.#handleMouseDown.bind(this))
 
     this.canvas.addEventListener("mouseup", (e: MouseEvent) => {
-      this.isClicked = false
-    })
-
-    this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
-      let mouse = new Point(e.offsetX, e.offsetY)
-      this.hovered = this.getNearestPoint(mouse, this.graph.points)
-      if (this.selected && this.isClicked) {
-        this.selected.x = mouse.x
-        this.selected.y = mouse.y
+      this.dragging = false
+      if (this.lastAction === "move") {
+        this.selected = null
       }
     })
+
+    this.canvas.addEventListener("mousemove", this.#handleMouseMove.bind(this))
   }
 
-  getNearestPoint(pt: Point, pts: Point[]) : Point | undefined {
-    const threshold = 10
-    return pts.find(p => p.distant(pt) < threshold)
+  #handleMouseMove(e: MouseEvent) {
+    this.mouse = new Point(e.offsetX, e.offsetY)
+    this.hovered = this.getNearestPoint(this.mouse, this.graph.points)
+    if (this.selected && this.dragging) {
+      this.selected.x = this.mouse.x
+      this.selected.y = this.mouse.y
+      if (this.lastAction !== "move") {
+        this.lastAction = "move"
+      }
+    }
+  }
+
+  #handleMouseDown(e: MouseEvent){
+    if(e.button === 2){ // right click
+      if (this.selected) {
+        this.selected = null
+        this.lastAction = null
+      } else if (this.hovered){
+        this.#removePoint(this.hovered)
+        this.lastAction = "remove"
+      }
+    }
+    if (e.button === 0) { // left click
+      if (this.hovered) {
+        this.#select(this.hovered)
+        this.dragging = true
+        this.lastAction = "select"
+        return
+      }
+      if (this.mouse){
+        this.graph.addPoint(this.mouse)
+        this.#select(this.mouse)
+        this.hovered = this.mouse
+        this.lastAction = "add"
+      }
+    }
+  
+  }
+
+  getNearestPoint(pt: Point, pts: Point[]) : Point | null {
+    const threshold = 15
+    return pts.find(p => p.distant(pt) < threshold) || null
   }
 
   display() {
@@ -72,6 +109,10 @@ class GraphEditor {
     }
     if (this.selected) {
       this.selected.draw(this.ctx, { outline: true })
+    }
+    if (this.mouse && this.selected) {
+      const intent = this.hovered ? this.hovered : this.mouse
+      new Segment(this.selected, intent).draw(this.ctx, { dash : true })
     }
   }
 }

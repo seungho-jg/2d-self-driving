@@ -1,4 +1,4 @@
-interface drawStyle{
+interface drawPointStyle{
   size?: number
   color?: string
   outline?: boolean
@@ -12,7 +12,7 @@ class Point {
     this.y = y;
   }
 
-  draw(ctx: CanvasRenderingContext2D, {size = 5, color = 'black', outline = false, fill = false} : drawStyle){
+  draw(ctx: CanvasRenderingContext2D, {size = 5, color = 'black', outline = false, fill = false} : drawPointStyle = {}){
     const rad = size / 2
     if (!outline && !fill) {
       ctx.beginPath()

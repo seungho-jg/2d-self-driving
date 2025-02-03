@@ -8,6 +8,7 @@
   let ctx: CanvasRenderingContext2D;
   let graph: Graph;
   let graphEditor: GraphEditor;
+  let viewport: any;
 
   let animationId: number
   
@@ -16,6 +17,8 @@
     canvas.height = window.innerHeight
     canvas.width = window.innerWidth
     graph = new Graph([],[])
+    // viewport = new viewport(cnavas)
+    
     graphEditor = new GraphEditor(canvas, graph)
 
     function animation(){

@@ -1,5 +1,10 @@
 import Point from "./point";
 
+interface segmentStyle {
+  lineWidth?: number,
+  color?: string,
+  dash?: boolean
+}
 class Segment {
   startPt: Point
   endPt: Point
@@ -16,10 +21,11 @@ class Segment {
     return this.startPt.equars(point) || this.endPt.equars(point)
   }
 
-  draw(ctx: CanvasRenderingContext2D, lineWidth=3, color='black') {
+  draw(ctx: CanvasRenderingContext2D, { lineWidth=3, color='black', dash=false } : segmentStyle = {}) {
     ctx.beginPath()
     ctx.lineWidth = lineWidth
     ctx.strokeStyle = color
+    dash ? ctx.setLineDash([3,3]) : ctx.setLineDash([])
     ctx.moveTo(this.startPt.x, this.startPt.y)
     ctx.lineTo(this.endPt.x, this.endPt.y)
     ctx.stroke()
