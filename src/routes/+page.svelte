@@ -3,26 +3,35 @@
   import Segment from "$lib/primitives/segment";
   import Graph from "$lib/math/graph";
   import GraphEditor from "$lib/tools/graphEditor"
+  import Viewport from "$lib/tools/viewport";
   
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
-  let graph: Graph;
   let graphEditor: GraphEditor;
-  let viewport: any;
-
+  let viewport: Viewport;
+  
   let animationId: number
+  let graphString: string | null
+  let graphInfo
+  let graph: Graph
+
+
   
   $effect(()=> {
     ctx = canvas.getContext("2d") as CanvasRenderingContext2D
     canvas.height = window.innerHeight
     canvas.width = window.innerWidth
-    graph = new Graph([],[])
-    // viewport = new viewport(cnavas)
-    
-    graphEditor = new GraphEditor(canvas, graph)
+    graphString = localStorage.getItem("graph")
+    graphInfo =  graphString ? JSON.parse(graphString) : null
+    graph = graphInfo
+    ? Graph.load(graphInfo)
+    : new Graph([],[])
+
+    viewport = new Viewport(canvas)
+    graphEditor = new GraphEditor(viewport, graph)
 
     function animation(){
-      ctx.clearRect(0,0, canvas.width, canvas.height)
+      viewport.reset()
       graphEditor.display()
       animationId = requestAnimationFrame(animation)
     }
@@ -94,13 +103,18 @@
     graph.dispose()
   }
 
+  function dispose() {
+    graphEditor.dispose()
+  }
+
+  function save() {
+    localStorage.setItem("graph", JSON.stringify(graph))
+  }
+
 </script>
 <div class="flex flex-row justify-center absolute mx-auto w-full gap-2 top-2">
-  <!-- <button class="btn" onclick={addPoint}>add point</button> -->
-  <button class="btn" onclick={addSegment}>add segment</button>
-  <!-- <button class="btn" onclick={removePoint}>remove point</button> -->
-  <!-- <button class="btn" onclick={removeSegment}>remove segment</button> -->
-  <button class="btn" onclick={removeAll}>remove All</button>
+  <button class="btn" onclick={dispose}>🗑️</button>
+  <button class="btn" onclick={save}>💾</button>
 </div>
 
 <canvas bind:this={canvas}></canvas>

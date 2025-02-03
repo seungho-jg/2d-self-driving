@@ -1,8 +1,10 @@
 import type Graph from "$lib/math/graph";
 import Point from "$lib/primitives/point";
 import Segment from "$lib/primitives/segment";
+import type Viewport from "./viewport";
 
 class GraphEditor {
+  viewport: Viewport
   canvas: HTMLCanvasElement
   graph: Graph
   ctx: CanvasRenderingContext2D
@@ -12,8 +14,9 @@ class GraphEditor {
   mouse: Point | null
   lastAction: string | null
 
-  constructor(canvas: HTMLCanvasElement, grahp: Graph){
-    this.canvas = canvas
+  constructor(viewport: Viewport, grahp: Graph){
+    this.viewport = viewport
+    this.canvas = viewport.canvas
     this.graph = grahp
     this.selected = null
     this.dragging = false
@@ -59,7 +62,7 @@ class GraphEditor {
   }
 
   #handleMouseMove(e: MouseEvent) {
-    this.mouse = new Point(e.offsetX, e.offsetY)
+    this.mouse = this.viewport.getMouse(e, true)
     this.hovered = this.getNearestPoint(this.mouse, this.graph.points)
     if (this.selected && this.dragging) {
       this.selected.x = this.mouse.x
@@ -98,7 +101,7 @@ class GraphEditor {
   }
 
   getNearestPoint(pt: Point, pts: Point[]) : Point | null {
-    const threshold = 15
+    const threshold = 15 * this.viewport.zoom
     return pts.find(p => p.distant(pt) < threshold) || null
   }
 
@@ -114,6 +117,12 @@ class GraphEditor {
       const intent = this.hovered ? this.hovered : this.mouse
       new Segment(this.selected, intent).draw(this.ctx, { dash : true })
     }
+  }
+
+  dispose(){
+    this.graph.dispose()
+    this.selected = null
+    this.hovered = null
   }
 }
 

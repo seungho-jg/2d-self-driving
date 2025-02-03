@@ -7,6 +7,23 @@ class Graph {
   constructor(pts: Point[], segs: Segment[]) {
     this.points = pts
     this.segments = segs
+
+  }
+  
+  static load(graphInfo: {points: Point[], segments: Segment[]}){
+    console.log(graphInfo)
+    let pts = [];
+    return new Graph(
+      pts = graphInfo.points.map(pt =>
+        new Point(pt.x, pt.y)
+      ),
+      graphInfo.segments.map(seg =>
+          new Segment(
+            pts.find(p => p.equars(seg.startPt))!,
+            pts.find(p => p.equars(seg.endPt))!
+          )
+      )
+    )
   }
 
   addPoint(point: Point) {

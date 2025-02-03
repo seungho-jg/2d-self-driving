@@ -1,9 +1,9 @@
 import Point from "./point";
 
 interface segmentStyle {
-  lineWidth?: number,
-  color?: string,
-  dash?: boolean
+  lineWidth?: number;
+  color?: string;
+  dash?: boolean;
 }
 class Segment {
   startPt: Point

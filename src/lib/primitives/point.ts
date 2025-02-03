@@ -1,8 +1,8 @@
 interface drawPointStyle{
-  size?: number
-  color?: string
-  outline?: boolean
-  fill? : boolean
+  size?: number;
+  color?: string;
+  outline?: boolean;
+  fill? : boolean;
 }
 class Point {
   x: number
