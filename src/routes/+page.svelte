@@ -4,6 +4,8 @@
   import Graph from "$lib/math/graph";
   import GraphEditor from "$lib/tools/graphEditor"
   import Viewport from "$lib/tools/viewport";
+  import Polygon from "$lib/primitives/polygon";
+  import Envelope from "$lib/primitives/envelope";
   
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -33,6 +35,7 @@
     function animation(){
       viewport.reset()
       graphEditor.display()
+      new Envelope(graph.segments[1], 100).draw(ctx)
       animationId = requestAnimationFrame(animation)
     }
     animation()

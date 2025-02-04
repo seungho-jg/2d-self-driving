@@ -16,4 +16,11 @@ function scale(p1: Point, scaler: number ) {
   return new Point(p1.x * scaler, p1.y * scaler)
 }
 
-export { distance, add, subtract, scale }
+function translate(loc: Point, angle: number, offset: number ) : Point {
+  return new Point(
+    loc.x + Math.cos(angle)*offset,
+    loc.y + Math.sin(angle)*offset
+  )
+}
+
+export { distance, add, subtract, scale, translate }

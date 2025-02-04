@@ -11,7 +11,6 @@ class Graph {
   }
   
   static load(graphInfo: {points: Point[], segments: Segment[]}){
-    console.log(graphInfo)
     let pts = [];
     return new Graph(
       pts = graphInfo.points.map(pt =>
